@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 with open('README.rst') as readme_file:
     readme = readme_file.read()
 
-requirements = ['iris', 'scipy']
+requirements = ['iris', 'numpy', 'scipy']
 
 setup_requirements = [ ]
 
@@ -29,7 +29,7 @@ setup(
     include_package_data=True,
     keywords='iris_extensions',
     name='iris_extensions',
-    packages=find_packages(include=['iris_extensions']),
+    packages=find_packages(include=['irise']),
     setup_requires=setup_requirements,
     test_suite='tests',
     tests_require=test_requirements,
