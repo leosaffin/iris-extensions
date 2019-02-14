@@ -1,5 +1,4 @@
-===============
-iris_extensions
+iris-extensions
 ===============
 
 Functionality built on iris I have used for work.

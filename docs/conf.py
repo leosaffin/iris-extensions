@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# iris_extensions documentation build configuration file, created by
+# iris-extensions documentation build configuration file, created by
 # sphinx-quickstart on Mon May 30 09:50:49 2016.
 #
 # This file is execfile()d with the current directory set to its
@@ -79,7 +79,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'iris_extensions'
+project = u'iris-extensions'
 copyright = u'2019, Leo Saffin'
 author = u'Leo Saffin'
 
@@ -128,7 +128,7 @@ add_module_names = True
 pygments_style = 'sphinx'
 
 # A list of ignored prefixes for module index sorting.
-modindex_common_prefix = ['iris_extensions']
+modindex_common_prefix = ['irise']
 
 # If true, keep warnings as "system message" paragraphs in the built documents.
 #keep_warnings = False
@@ -233,7 +233,7 @@ html_static_path = ['_static']
 #html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'iris_extensionsdoc'
+htmlhelp_basename = 'iris-extensionsdoc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -255,7 +255,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'iris_extensions.tex', u'iris_extensions Documentation',
+    (master_doc, 'iris-extensions.tex', u'iris-extensions Documentation',
      u'Leo Saffin', 'manual'),
 ]
 
@@ -285,7 +285,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'iris_extensions', u'iris_extensions Documentation',
+    (master_doc, 'iris-extensions', u'iris-extensions Documentation',
      [author], 1)
 ]
 
@@ -299,8 +299,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'iris_extensions', u'iris_extensions Documentation',
-     author, 'iris_extensions', 'One line description of project.',
+    (master_doc, 'iris-extensions', u'iris-extensions Documentation',
+     author, 'iris-extensions', 'One line description of project.',
      'Miscellaneous'),
 ]
 

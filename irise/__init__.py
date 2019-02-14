@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""Top-level package for iris_extensions."""
+"""Top-level package for iris-extensions."""
 
 __author__ = """Leo Saffin"""
 __email__ = 'string_buster@hotmail.com'
