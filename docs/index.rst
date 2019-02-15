@@ -9,6 +9,7 @@
    grid
    interpolate
    calculus
+   convert
 
 
 Indices and tables
