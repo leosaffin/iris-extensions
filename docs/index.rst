@@ -8,6 +8,7 @@
    forecast
    grid
    interpolate
+   calculus
 
 
 Indices and tables
