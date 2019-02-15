@@ -6,6 +6,8 @@
 
    self
    forecast
+   grid
+   interpolate
 
 
 Indices and tables
