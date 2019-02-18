@@ -10,6 +10,7 @@
    interpolate
    calculus
    convert
+   spectral
    diagnostics
 
 
