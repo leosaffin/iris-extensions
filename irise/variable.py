@@ -309,6 +309,64 @@ def potential_vorticity(u, v, w, theta, rho):
     return epv
 
 
+def isentropic_circulation(pv, pressure, mask=None):
+    r"""Calculate the circulation associated with a given PV anomaly
+
+    :math:`C_{\theta} = \iint_R \sigma Q dx dy`
+
+    args:
+        pv (iris.cube.Cube or iris.cube.CubeList): Potential vorticity on
+            isentropic levels
+
+        pressure (iris.cube.Cube): Pressure at gridpoints
+
+        mask (numpy.ndarray): Mask for area to integrate over
+
+    returns:
+        iris.cube.CubeList: The circulation from each PV in q
+    """
+    # Make sure to iterate over list or cubelist
+    if type(pv) == iris.cube.Cube:
+        pv = [pv]
+
+    # Calculate pressure halfway between theta levels
+    theta_levs = pv[0].coord('air_potential_temperature').points
+    dtheta = theta_levs[1] - theta_levs[0]
+    theta_levs = list(theta_levs - dtheta / 2)
+    theta_levs.append(theta_levs[-1] + dtheta)
+    p_theta = interpolate.to_level(
+        pressure, air_potential_temperature=theta_levs)
+
+    # Calculate isentropic theta gradient at theta levels
+    dp_dtheta = differentiate(p_theta, 'air_potential_temperature')
+
+    # Calculate isentropic density
+    sigma = -1 * dp_dtheta / constants.g
+
+    # Apply the mask to sigma as it is used in each calculation
+    if mask is not None:
+        sigma.data = np.ma.masked_where(mask, sigma.data)
+
+    # Extract the xy coordinate names to collapse the cube over
+    coords = [grid.extract_dim_coord(sigma, axis).name()
+              for axis in ['x', 'y']]
+
+    # Calculate the weights to perform area integration
+    # weights = iris.analysis.cartography.area_weights(sigma)
+    weights = grid.volume(pressure)[-1].data * np.ones_like(pv[0].data)
+
+    circulation = iris.cube.CubeList()
+    for pv_i in pv:
+        # Calculate the circulation
+        c_i = (sigma * pv_i).collapsed(coords, MEAN, weights=weights)
+
+        # Give the cube a meaningful name
+        c_i.rename('circulation_due_to_' + pv_i.name())
+        circulation.append(c_i)
+
+    return circulation
+
+
 def mslp(theta, Pi, w, lapse_rate=0.0065, npmsl_height=500.0):
     """Calculate mean sea-level pressure
 
