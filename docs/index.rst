@@ -10,6 +10,7 @@
    interpolate
    calculus
    convert
+   diagnostics
 
 
 Indices and tables
