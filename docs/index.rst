@@ -12,6 +12,7 @@
    convert
    spectral
    diagnostics
+   plot
 
 
 Indices and tables

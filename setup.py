@@ -6,7 +6,7 @@ from numpy.distutils.core import setup, Extension
 with open('README.rst') as readme_file:
     readme = readme_file.read()
 
-requirements = ['scitools-iris', 'numpy', 'scipy']
+requirements = ['scitools-iris', 'numpy', 'scipy', 'matplotlib']
 
 setup_requirements = [ ]
 
