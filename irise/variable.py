@@ -338,7 +338,7 @@ def isentropic_circulation(pv, pressure, mask=None):
         pressure, air_potential_temperature=theta_levs)
 
     # Calculate isentropic theta gradient at theta levels
-    dp_dtheta = differentiate(p_theta, 'air_potential_temperature')
+    dp_dtheta = calculus.differentiate(p_theta, 'air_potential_temperature')
 
     # Calculate isentropic density
     sigma = -1 * dp_dtheta / constants.g
@@ -358,7 +358,8 @@ def isentropic_circulation(pv, pressure, mask=None):
     circulation = iris.cube.CubeList()
     for pv_i in pv:
         # Calculate the circulation
-        c_i = (sigma * pv_i).collapsed(coords, MEAN, weights=weights)
+        c_i = (sigma * pv_i).collapsed(
+            coords, iris.analysis.MEAN, weights=weights)
 
         # Give the cube a meaningful name
         c_i.rename('circulation_due_to_' + pv_i.name())
