@@ -178,4 +178,10 @@ stash_map = {
         dict(name="microphysics_evaporaion_q", units="1"),
     STASH(model=1, section=0, item=674):
         dict(name="microphysics_melting_q", units="1"),
+    STASH(model=1, section=0, item=675):
+        dict(name="boundary_layer_entrainment_q", units="1"),
+    STASH(model=1, section=0, item=676):
+        dict(name="boundary_layer_surface_fluxes_q", units="1"),
+    STASH(model=1, section=0, item=677):
+        dict(name="boundary_layer_other_q", units="1"),
 }
