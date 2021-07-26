@@ -13,6 +13,7 @@ from iris.fileformats.pp import STASH
 def load(uris, constraints=None, callback=None):
     cubes = iris.load(uris, constraints=constraints, callback=callback)
     fix_by_stash(cubes)
+    cubes.sort(key=get_stash)
 
     return cubes
 
@@ -175,7 +176,7 @@ stash_map = {
     STASH(model=1, section=0, item=672):
         dict(name="microphysics_deposition_q", units="1"),
     STASH(model=1, section=0, item=673):
-        dict(name="microphysics_evaporaion_q", units="1"),
+        dict(name="microphysics_evaporation_q", units="1"),
     STASH(model=1, section=0, item=674):
         dict(name="microphysics_melting_q", units="1"),
     STASH(model=1, section=0, item=675):
@@ -184,4 +185,10 @@ stash_map = {
         dict(name="boundary_layer_surface_fluxes_q", units="1"),
     STASH(model=1, section=0, item=677):
         dict(name="boundary_layer_other_q", units="1"),
+    STASH(model=1, section=0, item=678):
+        dict(name="fast_physics_q", units="1"),
+    STASH(model=1, section=0, item=679):
+        dict(name="theta_perturbations_q", units="1"),
+    STASH(model=1, section=0, item=680):
+        dict(name="leonard_terms_q", units="1"),
 }
