@@ -99,7 +99,7 @@ def polar_horizontal(cube, axis):
     # Coordinates
     # Calculate radius relative to Earth centre
     radius = grid.make_cube(diff, 'altitude')
-    radius.data += constants.earth_radius.data
+    radius.data += constants.earth_avg_radius.data
     if axis.lower() == 'x':
         lat = (grid.extract_dim_coord(diff, 'y').points *
                constants.radians_per_degree.data)

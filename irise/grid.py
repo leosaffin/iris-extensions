@@ -21,7 +21,7 @@ def polar_coords(cube):
             The zonal and meridional co-ordinates in radians and the vertical
             co-ordinate in metres
     """
-    rho = constants.earth_radius.data + cube.coord('altitude').points
+    rho = constants.earth_avg_radius.data + cube.coord('altitude').points
     x, y = cartography.get_xy_grids(cube)
 
     theta = x * (np.pi / 180)
@@ -61,7 +61,7 @@ def volume(cube):
         information
     """
     # Get the coordinates
-    bounds = constants.earth_radius.data + cube.coord('altitude').bounds
+    bounds = constants.earth_avg_radius.data + cube.coord('altitude').bounds
     theta, phi, rho = polar_coords(cube)
 
     # Calculate the volume in each gridbox as a spherical integral

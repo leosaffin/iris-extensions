@@ -22,7 +22,7 @@ def pressure(Pi):
     Returns:
         Air Pressure (Same type as input)
     """
-    return Pi ** (constants.c_p / constants.R).data * constants.P_0
+    return Pi ** (constants.Cp_d / constants.Rd).data * constants.P0
 
 
 def exner(P):
@@ -36,7 +36,7 @@ def exner(P):
     Returns:
         Exner Pressure (Same type as input)
     """
-    return (P / constants.P_0) ** (constants.R / constants.c_p).data
+    return (P / constants.P0) ** (constants.Rd / constants.Cp_d).data
 
 
 def density(P, T):
@@ -52,7 +52,7 @@ def density(P, T):
     Returns:
         Air Density (Same type as inputs)
     """
-    return P / (T * constants.R)
+    return P / (T * constants.Rd)
 
 
 def wind_speed(u, v, w):
@@ -80,7 +80,7 @@ def theta_e(theta, rvs, T):
     Returns:
         theta_e (iris.cube.Cube)
     """
-    return theta * maths.exp((rvs * constants.L) / (T * constants.c_p))
+    return theta * maths.exp((rvs * constants.Lv) / (T * constants.Cp_d))
 
 
 def r_vs(P, e_s):
@@ -94,7 +94,7 @@ def r_vs(P, e_s):
     Returns:
         r_vs (Same type as inputs)
     """
-    return (e_s / (P - e_s)) * (constants.mu_v / constants.mu_d).data
+    return (e_s / (P - e_s)) * (constants.water_molecular_weight / constants.dry_air_molecular_weight).data
 
 
 def vapour_pressure(P, q):
@@ -108,7 +108,7 @@ def vapour_pressure(P, q):
     Returns:
         Vapour Pressure (Same type as inputs)
     """
-    return P * q * (constants.R_v / constants.R)
+    return P * q * (constants.Rv / constants.Rd)
 
 
 def tetens(T):
@@ -240,7 +240,7 @@ def coriolis_parameter(cube):
     """
     # Calculate the Coriolis parameter
     lat = grid.true_coords(cube)[1]
-    f = 2 * constants.Omega.data * np.sin(np.deg2rad(lat))
+    f = 2 * constants.omega.data * np.sin(np.deg2rad(lat))
 
     # Put the output into a cube
     f = iris.cube.Cube(
@@ -280,7 +280,7 @@ def potential_vorticity(u, v, w, theta, rho):
 
     # Absolute vorticity
     lat = grid.true_coords(theta)[1]
-    f = 2 * constants.Omega.data * np.sin(lat * np.pi / 180)
+    f = 2 * constants.omega.data * np.sin(lat * np.pi / 180)
     zterm.data = zterm.data + f
 
     # Grad(theta)
@@ -387,8 +387,8 @@ def mslp(theta, Pi, w, lapse_rate=0.0065, npmsl_height=500.0):
         iris.cube.Cube:
     """
     # Extract height coordinate of each grid position
-    z_theta = constants.earth_radius.data + w.coord('altitude').points
-    z_rho = constants.earth_radius.data + Pi.coord('altitude').points[:-1]
+    z_theta = constants.earth_avg_radius.data + w.coord('altitude').points
+    z_rho = constants.earth_avg_radius.data + Pi.coord('altitude').points[:-1]
     level_height = theta.coord('level_height').points
 
     # Calculate grid variables
@@ -410,8 +410,8 @@ def mslp(theta, Pi, w, lapse_rate=0.0065, npmsl_height=500.0):
     # Calculate mean sea-level pressure using hacked MetUM routine
     P_msl = fvariable.calc_pmsl(
         theta.data, Pi.data, P.data, P_star.data, z_theta, z_rho, cos_theta_lat,
-        level_height, constants.c_p.data, constants.g.data, constants.R.data,
-        lapse_rate, constants.earth_radius.data, delta_lambda, delta_phi,
+        level_height, constants.Cp_d.data, constants.g.data, constants.Rd.data,
+        lapse_rate, constants.earth_avg_radius.data, delta_lambda, delta_phi,
         npmsl_height)
 
     # Copy data into a new cube
