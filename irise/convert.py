@@ -54,7 +54,14 @@ def calc(names, cubelist, levels=None):
                 cube.add_aux_coord(coord, range(cube.ndim))
 
             # Interpolate to the requested coordinate levels
-            output.append(interpolate.to_level(cube, **{coord_name: values}))
+            if coord.points.ndim == 1:
+                result = cube.interpolate(
+                    [(coord_name, values)],
+                    iris.analysis.Linear()
+                )
+            else:
+                result = interpolate.to_level(cube, **{coord_name: values})
+            output.append(result)
 
         if len(names) == 1:
             return output[0]
@@ -291,5 +298,21 @@ available = {
     'diabatic_pv': {
         'function': variable.potential_vorticity,
         'required': ['x_wind', 'y_wind', 'upward_air_velocity',
-                     'total_minus_advection_only_theta', 'air_density']}
+                     'total_minus_advection_only_theta', 'air_density']},
+
+    # Moisture traces
+    'total_minus_advection_only_q': {
+        'function': _subtract,
+        'required': ['specific_humidity', 'advection_only_q']},
+
+    'sum_of_physics_q_tracers': {
+        'function': _summation,
+        'required': ['short_wave_radiation_q', 'long_wave_radiation_q',
+                     'microphysics_q', 'convection_q',
+                     'boundary_layer_q']},
+
+    'residual_q': {
+        'function': _subtract,
+        'required': ['total_minus_advection_only_q',
+                     'sum_of_physics_q_tracers']},
 }
