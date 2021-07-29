@@ -38,6 +38,8 @@ extensions = [
     'sphinx.ext.intersphinx',
 ]
 
+autodoc_mock_imports = ["numpy.distutils.core.Extension"]
+
 # Autodoc settings
 autodoc_member_order = 'bysource'
 
