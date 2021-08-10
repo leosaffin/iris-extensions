@@ -14,7 +14,6 @@ test_requirements = [ ]
 
 fortran = Extension('fortran', libraries=['interpolate'],
                     sources=['irise/diagnostic.f90',
-                             'irise/grid.f90',
                              'irise/interpolate.f90',
                              'irise/variable.f90'])
 
