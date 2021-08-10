@@ -187,9 +187,9 @@ def overlay_winds(u, v, nx, ny, **kwargs):
 
     """
     # Extract a coarse representation of the x and y coordinates
-    xcoord = grid.extract_dim_coord(u, 'x')
+    xcoord = u.coord(axis='x', dim_coords=True)
     x_fac = int(len(xcoord.points) / nx)
-    ycoord = grid.extract_dim_coord(u, 'y')
+    ycoord = u.coord(axis='y', dim_coords=True)
     y_fac = int(len(ycoord.points) / ny)
     x_coarse = xcoord.points[::x_fac]
     y_coarse = ycoord.points[::y_fac]

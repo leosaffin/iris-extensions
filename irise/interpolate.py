@@ -168,8 +168,8 @@ def to_level(cube, order=0, **kwargs):
     newcube = iris.cube.Cube(
         newdata, long_name=cube.name(), units=cube.units,
         attributes=cube.attributes,
-        dim_coords_and_dims=[(grid.extract_dim_coord(cube, 'y'), 1),
-                             (grid.extract_dim_coord(cube, 'x'), 2)])
+        dim_coords_and_dims=[(cube.coord(axis='y', dim_coords=True), 1),
+                             (cube.coord(axis='x', dim_coords=True), 2)])
 
     # Add the new co-ordinate to the output cube
     newcoord = iris.coords.AuxCoord(
@@ -216,7 +216,7 @@ def remap_3d(cube, target, vert_coord=None):
 
     # Interpolate in the vertical
     if vert_coord is None:
-        z = grid.extract_dim_coord(target, 'z')
+        z = target.coord(axis='z', dim_coords=True)
     else:
         z = target.coord(vert_coord)
     cube = cube.interpolate([(z.name(), z.points)], iris.analysis.Linear())

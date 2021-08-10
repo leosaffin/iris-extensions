@@ -38,7 +38,7 @@ def multidim(y, x, axis):
 
     # Get the coordinate for the axis to be differentiated over
     try:
-        k = grid.extract_dim_coord(y, axis)
+        k = y.coord(axis=axis, dim_coords=True)
     except ValueError:
         # Allow referencing the coordinate by name
         k = y.coord(axis)
@@ -67,7 +67,7 @@ def diff_by_axis(cube, axis):
         dimensional coordinate on the chosen axis
     """
     # Extract the dimensional coordinate corresponding to the axis
-    coord = grid.extract_dim_coord(cube, axis)
+    coord = cube.coord(axis=axis, dim_coords=True)
 
     # Calculate the derivative
     diff = differentiate(cube, coord)
@@ -101,7 +101,7 @@ def polar_horizontal(cube, axis):
     radius = grid.make_cube(diff, 'altitude')
     radius.data += constants.earth_avg_radius.data
     if axis.lower() == 'x':
-        lat = (grid.extract_dim_coord(diff, 'y').points *
+        lat = (diff.coord(axis='y').points *
                constants.radians_per_degree.data)
         lat = np.outer(lat, np.ones(diff.shape[-1]))
         metres_per_radian = radius * np.cos(lat)

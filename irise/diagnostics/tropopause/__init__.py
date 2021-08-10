@@ -35,8 +35,8 @@ def dynamical(pv, q, pvtrop=2.0, qmax=0.001):
         np.abs(pv.data), q.data, z, pvtrop, qmax)
 
     # Put the result in a cube
-    xcoord = grid.extract_dim_coord(pv, 'X')
-    ycoord = grid.extract_dim_coord(pv, 'Y')
+    xcoord = pv.coord(axis='X', dim_coords=True)
+    ycoord = pv.coord(axis='Y', dim_coords=True)
 
     trop = iris.cube.Cube(
         trop, long_name='dynamical_tropopause_altitude', units='m',
@@ -90,8 +90,8 @@ def thermal(temperature, zmin=4500, threshold=-0.002, dz=2000):
 
     # Put the result in a cube
     try:
-        xcoord = grid.extract_dim_coord(temperature, 'X')
-        ycoord = grid.extract_dim_coord(temperature, 'Y')
+        xcoord = temperature.coord(axis='X', dim_coords=True)
+        ycoord = temperature.coord(axis='Y', dim_coords=True)
         dim_coords_and_dims = [(ycoord, 0), (xcoord, 1)]
     except NameError:
         dim_coords_and_dims = []

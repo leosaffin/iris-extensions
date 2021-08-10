@@ -129,7 +129,7 @@ def depth_average(cube, coord, minimum, maximum, axis, aggregator=MEAN,
     cube.data = np.ma.masked_where(mask, cube.data)
 
     # Calculate the mean of the cube across the coordinate
-    dim_coord = grid.extract_dim_coord(cube, axis)
+    dim_coord = cube.coord(axis=axis, dim_coords=True)
     integral = cube.collapsed(dim_coord, aggregator, **kwargs)
 
     return integral
@@ -186,8 +186,8 @@ def profile(x, surface, dz, mask=None, aggregator=MEAN, **kwargs):
                 mask * np.ones_like(newcube.data), newcube.data)
 
         # Collapse the cube along the horizontal dimensions
-        xcoord = grid.extract_dim_coord(cube, 'X')
-        ycoord = grid.extract_dim_coord(cube, 'Y')
+        xcoord = cube.coord(axis='X', dim_coords=True)
+        ycoord = cube.coord(axis='Y', dim_coords=True)
         cubes.append(newcube.collapsed([xcoord, ycoord], aggregator, **kwargs))
 
     return cubes

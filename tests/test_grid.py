@@ -37,11 +37,7 @@ def test_add_hybrid_height():
     pass
 
 
-def add_hybrid_pressure():
-    pass
-
-
-def test_extract_dim_coord():
+def test_add_hybrid_pressure():
     pass
 
 

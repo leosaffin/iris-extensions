@@ -7,7 +7,6 @@ from iris.analysis import cartography
 from irise import constants
 
 
-
 def polar_coords(cube):
     """Get spherical polar coordinates from a cube
 
@@ -79,7 +78,7 @@ def volume(cube, z_name="altitude"):
         iris.cube.Cube: A cube copied from the original with the volume
         information
     """
-    z_bounds = constants.earth_avg_radius.data + cube.coord(z_name).bounds
+    z_bounds = cube.coord(z_name).bounds
 
     a = area(cube)
     dz = z_bounds[..., 1] - z_bounds[..., 0]
@@ -192,43 +191,6 @@ def add_hybrid_pressure(cube):
     cube.add_aux_factory(factory)
 
     return
-
-
-def extract_dim_coord(cube, axis):
-    """Extracts a coordinate from a cube based on the axis it represents
-
-    Uses :py:func:`iris.util.guess_coord_axis` to match a dimensional coordinate
-    with the requested axis
-
-    Args:
-        cube (iris.cube.Cube):
-
-        axis (str): The co-ordinate axis to take from the cube. Must be one of
-            X,Y,Z,T.
-
-    Returns:
-        iris.coords.DimCoord:
-            The dimensional coordinate matching the requested axis on the given
-            cube.
-
-    Raises:
-        ValueError: If axis is not one of X,Y,Z,T
-
-        KeyError: If the cube does not contain a coord with the requested axis
-    """
-    axis = axis.upper()
-    # If the axis supplied is not correct raise an error
-    if axis not in ['X', 'Y', 'Z', 'T']:
-        raise ValueError('Must specify a co-ordinate axis')
-
-    # Loop over dimensional coords in the cube
-    for coord in cube.dim_coords:
-        # Return the coordinate if it matches the axis
-        if axis == iris.util.guess_coord_axis(coord):
-            return coord
-
-    # If no coordinate matches raise an error
-    raise KeyError('Cube has no coordinate for axis ' + axis)
 
 
 def get_datetime(cube):

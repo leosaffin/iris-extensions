@@ -165,7 +165,7 @@ def column_integral(cube, **kwargs):
         iris.cube.Cube: A 2d collapsed cube
     """
 
-    z = grid.extract_dim_coord(cube, 'z')
+    z = cube.coord(axis='z', dim_coords=True)
 
     return cube.collapsed(z.name(), iris.analysis.SUM, **kwargs)
 
@@ -246,8 +246,8 @@ def coriolis_parameter(cube):
     f = iris.cube.Cube(
         f, long_name='coriolis_parameter', units='s-1',
         attributes=cube.attributes,
-        dim_coords_and_dims=[(grid.extract_dim_coord(cube, 'y'), 0),
-                             (grid.extract_dim_coord(cube, 'x'), 1)])
+        dim_coords_and_dims=[(cube.coord(axis='y', dim_coords=True), 0),
+                             (cube.coord(axis='x', dim_coords=True), 1)])
 
     return f
 
@@ -348,7 +348,7 @@ def isentropic_circulation(pv, pressure, mask=None):
         sigma.data = np.ma.masked_where(mask, sigma.data)
 
     # Extract the xy coordinate names to collapse the cube over
-    coords = [grid.extract_dim_coord(sigma, axis).name()
+    coords = [sigma.coord(axis=axis).name()
               for axis in ['x', 'y']]
 
     # Calculate the weights to perform area integration
@@ -462,7 +462,7 @@ def brunt_vaisala_squared(theta, zcoord='altitude'):
     dtheta_dz = calculus.multidim(theta, z, 'z')
 
     # Interpolate derivatives back to original levels
-    zdim = grid.extract_dim_coord(theta, 'z')
+    zdim = theta.coord(axis='z')
     dtheta_dz = interpolate.interpolate(dtheta_dz, **{zdim.name(): zdim.points})
 
     # Calculate Brunt-Vaisala frequency squared
@@ -544,7 +544,7 @@ def isentropic_density(p, theta):
     dp_dtheta = calculus.multidim(p, theta, 'z')
 
     # Interpolate back to theta levels
-    z = grid.extract_dim_coord(theta, 'z')
+    z = theta.coord(axis='z')
     dp_dtheta = interpolate.interpolate(dp_dtheta,  **{z.name(): z.points})
 
     # Calculate isentropic density
