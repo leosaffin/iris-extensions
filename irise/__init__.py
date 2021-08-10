@@ -8,6 +8,7 @@ __version__ = '0.2.0'
 
 import iris
 from iris.fileformats.pp import STASH
+from iris.util import squeeze
 
 
 def load(uris, constraints=None, callback=None):
@@ -15,7 +16,7 @@ def load(uris, constraints=None, callback=None):
     fix_by_stash(cubes)
     cubes.sort(key=get_stash)
 
-    return cubes
+    return iris.cube.CubeList([squeeze(cube) for cube in cubes])
 
 
 def fix_by_stash(cubes):
