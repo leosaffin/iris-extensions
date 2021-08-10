@@ -1,7 +1,7 @@
 import pytest
 from iris.tests import stock
 
-from irise import calculus
+import irise
 
 @pytest.mark.parametrize(
     "cube",
@@ -10,7 +10,7 @@ from irise import calculus
     ]
 )
 def test_multidim(cube):
-    calculus.multidim(cube, "altitude", "z")
+    irise.calculus.multidim(cube, "altitude", "z")
 
 
 @pytest.mark.parametrize(
@@ -22,7 +22,7 @@ def test_multidim(cube):
 )
 def test_diff_by_axis(cube, axes):
     for axis in axes:
-        calculus.diff_by_axis(cube, axis)
+        irise.calculus.diff_by_axis(cube, axis)
 
 
 @pytest.mark.parametrize(
@@ -32,8 +32,8 @@ def test_diff_by_axis(cube, axes):
     ]
 )
 def test_polar_horizontal(cube):
-    calculus.polar_horizontal(cube, "x")
-    calculus.polar_horizontal(cube, "y")
+    irise.calculus.polar_horizontal(cube, "x")
+    irise.calculus.polar_horizontal(cube, "y")
 
 
 @pytest.mark.parametrize(
@@ -43,7 +43,7 @@ def test_polar_horizontal(cube):
     ]
 )
 def test_div(cube):
-    calculus.div(cube, cube, cube)
+    irise.calculus.div(cube, cube, cube)
 
 
 @pytest.mark.parametrize(
@@ -53,7 +53,7 @@ def test_div(cube):
     ]
 )
 def test_grad(cube):
-    calculus.grad(cube)
+    irise.calculus.grad(cube)
 
 
 @pytest.mark.parametrize(
@@ -63,7 +63,7 @@ def test_grad(cube):
     ]
 )
 def test_curl(cube):
-    calculus.curl(cube, cube, cube)
+    irise.calculus.curl(cube, cube, cube)
 
 
 @pytest.mark.parametrize(
@@ -73,4 +73,4 @@ def test_curl(cube):
     ]
 )
 def test_laplacian(cube):
-    calculus.laplacian(cube)
+    irise.calculus.laplacian(cube)

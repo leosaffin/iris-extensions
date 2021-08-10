@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 from iris.tests import stock
 
-from irise import interpolate
+import irise
 
 
 def test_interpolate():
@@ -16,7 +16,7 @@ def test_interpolate():
     ]
 )
 def test_cross_section(cube, result):
-    result = interpolate.cross_section(cube[0], 359.59, 359.60, -0.12, -0.11, 100)
+    result = irise.interpolate.cross_section(cube[0], 359.59, 359.60, -0.12, -0.11, 100)
 
     assert result.ndim == 2
     assert result.dim_coords[0].name() == "grid_latitude"
@@ -26,7 +26,7 @@ def test_cross_section(cube, result):
 
 def test_to_level():
     cube = stock.realistic_4d()
-    result = interpolate.to_level(cube[0], altitude=[5000])
+    result = irise.interpolate.to_level(cube[0], altitude=[5000])
 
     assert result.ndim == 3
     assert result.dim_coords[0].name() == "altitude"

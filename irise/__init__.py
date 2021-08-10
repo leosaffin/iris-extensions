@@ -10,6 +10,8 @@ import iris
 from iris.fileformats.pp import STASH
 from iris.util import squeeze
 
+from . import calculus, constants, convert, forecast, grid, interpolate, variable
+
 
 def load(uris, constraints=None, callback=None):
     cubes = iris.load(uris, constraints=constraints, callback=callback)

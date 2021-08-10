@@ -2,21 +2,21 @@ import pytest
 import numpy as np
 import iris
 
-from irise import variable
+import irise
 
 
 
 @pytest.mark.parametrize(
     "function, inputs, result",
     [
-        (variable.pressure, [0.5], 8838.834764831841),
-        (variable.exner, [85000], 0.9546275831395891),
-        (variable.density, [1e5, 300], 1.161248029720029),
-        (variable.wind_speed, [10, 5, 0.1], 11.180787092150535),
-        (variable.theta_e, [300, 0.01, 290], 326.8880672467619),
-        (variable.r_vs, [1e5, 1e3], 0.006282393030885892),
-        (variable.vapour_pressure, [1e5, 0.01], 1607.828426421411),
-        (variable.tetens, [290], 1934.1100957308577)
+        (irise.variable.pressure, [0.5], 8838.834764831841),
+        (irise.variable.exner, [85000], 0.9546275831395891),
+        (irise.variable.density, [1e5, 300], 1.161248029720029),
+        (irise.variable.wind_speed, [10, 5, 0.1], 11.180787092150535),
+        (irise.variable.theta_e, [300, 0.01, 290], 326.8880672467619),
+        (irise.variable.r_vs, [1e5, 1e3], 0.006282393030885892),
+        (irise.variable.vapour_pressure, [1e5, 0.01], 1607.828426421411),
+        (irise.variable.tetens, [290], 1934.1100957308577)
     ]
 )
 def test_scalars(function, inputs, result):
