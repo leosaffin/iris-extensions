@@ -6,6 +6,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import iris
 
+import irise
+
 
 class Forecast(object):
     """A collection of data from a single forecast
@@ -184,7 +186,7 @@ class _CubeLoader(object):
         self._make_space(time)
 
         # Load data from files with that lead time
-        cubes = iris.load(self.files[time])
+        cubes = irise.load(self.files[time])
 
         # Add the data to the loaded files
         self._loaded[time] = cubes
