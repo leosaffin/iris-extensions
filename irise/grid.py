@@ -5,7 +5,6 @@ import iris.util
 from iris.analysis import cartography
 
 from irise import constants
-from irise.fortran import grid as fgrid
 
 
 
@@ -49,7 +48,27 @@ def true_coords(cube):
     return lon, lat
 
 
-def volume(cube):
+def area(cube):
+    # Calling area_weights on a cube with a rotated pole will cause an error if the cube
+    # longitude/latitude and grid_longitude/grid_latitude coordinates. Just remove the
+    # longitude/latitude coordinates temporarily in this case
+    try:
+        area = iris.analysis.cartography.area_weights(cube)
+    except ValueError:
+        cube = cube.copy()
+        cube.remove_coord("longitude")
+        cube.remove_coord("latitude")
+        area = iris.analysis.cartography.area_weights(cube)
+
+    # The area weights calculation uses the Earth radius as part of the calculation
+    # Rescale by a factor to account for the altitude above earth
+    #z = ...
+    #area = (z**2 / iris.analysis.cartography.DEFAULT_SPHERICAL_EARTH_RADIUS**2) * area
+
+    return area
+
+
+def volume(cube, z_name="altitude"):
     """Calculate the volume of grid boxes
 
     Args:
@@ -60,15 +79,16 @@ def volume(cube):
         iris.cube.Cube: A cube copied from the original with the volume
         information
     """
-    # Get the coordinates
-    bounds = constants.earth_avg_radius.data + cube.coord('altitude').bounds
-    theta, phi, rho = polar_coords(cube)
+    z_bounds = constants.earth_avg_radius.data + cube.coord(z_name).bounds
 
-    # Calculate the volume in each gridbox as a spherical integral
-    data = fgrid.volume(rho, bounds, theta[0, :], phi[:, 0])
+    a = area(cube)
+    dz = z_bounds[..., 1] - z_bounds[..., 0]
+    dz = iris.util.broadcast_to_shape(dz, a.shape, cube.coord_dims(z_name))
+
+    vol = a * dz
 
     # Convert the output to a cube
-    output = cube.copy(data=data)
+    output = cube.copy(data=vol)
     output.rename('volume')
     output.units = 'm^3'
 
@@ -110,9 +130,20 @@ def make_cube(cube, coord_name):
         iris.cube.Cube:
     """
     coord = cube.coord(coord_name)
-    newcube = cube.copy(data=coord.points)
+
+    # Subselect the cube by the dimensions of the requested coordinate
+    axes = cube.coord_dims(coord_name)
+
+    sl = [slice(None)] * cube.ndim
+
+    for n in range(cube.ndim):
+        if n not in axes:
+            sl[n] = slice(0, 1)
+
+    newcube = iris.util.squeeze(cube[tuple(sl)]).copy(data=coord.points)
     newcube.units = coord.units
     newcube.rename(coord.name())
+
     return newcube
 
 
