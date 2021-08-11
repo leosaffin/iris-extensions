@@ -32,7 +32,7 @@ class Forecast(object):
 
     @property
     def lead_time(self):
-        return self.current_time - self.lead_time
+        return self.current_time - self.start_time
 
     def set_lead_time(self, *args, **kwargs):
         """Loads forecast data for the given lead time
