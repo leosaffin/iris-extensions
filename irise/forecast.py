@@ -19,7 +19,8 @@ class Forecast(object):
 
     Attributes:
         start_time (datetime.datetime): Same as input
-        current_time (datetime.datetime): The currently loaded lead time
+        current_time (datetime.datetime): The currently loaded time
+        lead_time (datetime.timedelta): The currently loaded lead time
         cubelist (iris.cube.CubeList): The currently loaded lead time data
     """
 
@@ -28,6 +29,10 @@ class Forecast(object):
         self.current_time = None
         self.cubelist = None
         self._loader = _CubeLoader(mapping)
+
+    @property
+    def lead_time(self):
+        return self.current_time - self.lead_time
 
     def set_lead_time(self, *args, **kwargs):
         """Loads forecast data for the given lead time
