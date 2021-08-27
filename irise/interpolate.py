@@ -5,7 +5,6 @@ import iris.cube
 import iris.coords
 import iris.util
 
-from irise import grid
 from irise.fortran import interpolate as finterpolate
 
 

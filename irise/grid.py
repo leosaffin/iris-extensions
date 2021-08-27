@@ -52,19 +52,41 @@ def area(cube):
     # longitude/latitude and grid_longitude/grid_latitude coordinates. Just remove the
     # longitude/latitude coordinates temporarily in this case
     try:
-        area = iris.analysis.cartography.area_weights(cube)
+        a = iris.analysis.cartography.area_weights(cube)
     except ValueError:
         cube = cube.copy()
         cube.remove_coord("longitude")
         cube.remove_coord("latitude")
-        area = iris.analysis.cartography.area_weights(cube)
+        a = iris.analysis.cartography.area_weights(cube)
 
     # The area weights calculation uses the Earth radius as part of the calculation
     # Rescale by a factor to account for the altitude above earth
     #z = ...
-    #area = (z**2 / iris.analysis.cartography.DEFAULT_SPHERICAL_EARTH_RADIUS**2) * area
+    #a = (z**2 / iris.analysis.cartography.DEFAULT_SPHERICAL_EARTH_RADIUS**2) * area
 
-    return area
+    return a
+
+
+def thickness(cube, z_name="altitude"):
+    """Calculate the vertical thickness of gridboxes
+
+    Args:
+        cube (iris.cube.Cube):
+
+        z_name (str):
+
+    Returns:
+
+    """
+    z_bounds = cube.coord(z_name).bounds
+    dz = z_bounds[..., 1] - z_bounds[..., 0]
+    dz = iris.util.broadcast_to_shape(dz, cube.shape, cube.coord_dims(z_name))
+
+    # Convert the output to a cube
+    output = cube.copy(data=dz)
+    output.units = "m"
+
+    return dz
 
 
 def volume(cube, z_name="altitude"):
@@ -74,17 +96,13 @@ def volume(cube, z_name="altitude"):
         cube (iris.cube.Cube): An iris cube with the relevant coordinate
             information. x/y grids and the altitude coordinate are required.
 
+        z_name (str):
+
     Returns:
         iris.cube.Cube: A cube copied from the original with the volume
         information
     """
-    z_bounds = cube.coord(z_name).bounds
-
-    a = area(cube)
-    dz = z_bounds[..., 1] - z_bounds[..., 0]
-    dz = iris.util.broadcast_to_shape(dz, a.shape, cube.coord_dims(z_name))
-
-    vol = a * dz
+    vol = area(cube) * thickness(cube, z_name=z_name)
 
     # Convert the output to a cube
     output = cube.copy(data=vol)

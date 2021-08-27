@@ -252,15 +252,15 @@ available = {
 
     'total_water_content': {
         'function': _multiply,
-        'required': ['mass', 'specific_total_water_content']},
+        'required': ['thickness', 'specific_total_water_content']},
 
     'liquid_water_content': {
         'function': _multiply,
-        'required': ['mass', 'mass_fraction_of_cloud_liquid_water_in_air']},
+        'required': ['thickness', 'mass_fraction_of_cloud_liquid_water_in_air']},
 
     'ice_content': {
         'function': _multiply,
-        'required': ['mass', 'mass_fraction_of_cloud_ice_in_air']},
+        'required': ['thickness', 'mass_fraction_of_cloud_ice_in_air']},
 
     'vapour_pressure': {
         'function': variable.vapour_pressure,
