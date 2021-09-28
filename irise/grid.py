@@ -86,7 +86,7 @@ def thickness(cube, z_name="altitude"):
     output = cube.copy(data=dz)
     output.units = "m"
 
-    return dz
+    return output
 
 
 def volume(cube, z_name="altitude"):

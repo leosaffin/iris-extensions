@@ -238,6 +238,10 @@ available = {
         'function': variable.surface_height,
         'required': ['air_potential_temperature']},
 
+    'thickness': {
+        'function': grid.thickness,
+        'required': ['air_pressure']},
+
     'total_column_water': {
         'function': variable.column_integral,
         'required': ['total_water_content']},
