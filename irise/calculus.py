@@ -1,3 +1,4 @@
+import iris.util
 import numpy as np
 from iris.analysis.calculus import differentiate
 from irise import constants, grid, interpolate
@@ -100,6 +101,13 @@ def polar_horizontal(cube, axis):
     # Calculate radius relative to Earth centre
     radius = grid.make_cube(diff, 'altitude')
     radius.data += constants.earth_avg_radius.data
+
+    if radius.ndim == 1:
+        radius = iris.util.broadcast_to_shape(radius.data, diff.shape, [0])
+        radius = diff.copy(data=radius)
+        radius.rename("altitude")
+        radius.units = "m"
+
     if axis.lower() == 'x':
         lat = (diff.coord(axis='y').points *
                constants.radians_per_degree.data)
