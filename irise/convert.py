@@ -242,6 +242,10 @@ available = {
         'function': grid.thickness,
         'required': ['air_pressure']},
 
+    'mass_thickness': {
+        'function': _multiply,
+        'required': ['thickness', 'air_density']},
+
     'total_column_water': {
         'function': variable.column_integral,
         'required': ['total_water_content']},
@@ -256,15 +260,15 @@ available = {
 
     'total_water_content': {
         'function': _multiply,
-        'required': ['thickness', 'specific_total_water_content']},
+        'required': ['mass_thickness', 'specific_total_water_content']},
 
     'liquid_water_content': {
         'function': _multiply,
-        'required': ['thickness', 'mass_fraction_of_cloud_liquid_water_in_air']},
+        'required': ['mass_thickness', 'mass_fraction_of_cloud_liquid_water_in_air']},
 
     'ice_content': {
         'function': _multiply,
-        'required': ['thickness', 'mass_fraction_of_cloud_ice_in_air']},
+        'required': ['mass_thickness', 'mass_fraction_of_cloud_ice_in_air']},
 
     'vapour_pressure': {
         'function': variable.vapour_pressure,
