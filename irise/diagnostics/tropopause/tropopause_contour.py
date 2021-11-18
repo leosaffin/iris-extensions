@@ -1,5 +1,6 @@
-from math import radians, cos, sin, asin, sqrt
 import numpy as np
+
+from irise.diagnostics.contours import haversine
 
 
 def get_contour_verts(cn):
@@ -169,24 +170,9 @@ def contour_length(points):
     Returns:
         float: The total length of the contour in kilometres
     """
-    conlen = 0
+    conlen = haversine(points[-1], points[0])
     for n in range(len(points) - 1):
         conlen += haversine(points[n], points[n+1])
 
     return conlen
 
-
-def haversine(x1, x2):
-    """ Calculate the great circle distance between two points on the earth
-    (specified in decimal degrees)
-    """
-    # convert decimal degrees to radians
-    lon1, lat1, lon2, lat2 = map(radians, [x1[0], x1[1], x2[0], x2[1]])
-
-    # haversine formula
-    dlon = lon2 - lon1
-    dlat = lat2 - lat1
-    a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2
-    c = 2 * asin(sqrt(a))
-    r = 6371  # Radius of earth in kilometers
-    return c * r
