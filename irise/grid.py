@@ -218,3 +218,50 @@ def get_datetime(cube):
     tcoord_as_datetime = tcoord.units.num2date(tcoord.points)
 
     return tcoord_as_datetime
+
+
+def broadcast_to_cube(cube, target):
+    """
+    Extend `iris.util.broadcast_to_shape` to broadcast a cube to a larger shape
+
+    Args:
+        cube:
+        target:
+
+    Returns:
+
+    """
+    c = target.dim_coords
+
+    common_dimensions = [c.index(coord) for coord in cube.dim_coords]
+
+    broadcast_data = iris.util.broadcast_to_shape(
+        cube.data, target.shape, common_dimensions,
+    )
+
+    broadcast_cube = iris.cube.Cube(
+        data=broadcast_data,
+        standard_name=cube.standard_name,
+        long_name=cube.long_name,
+        var_name=cube.var_name,
+        units=cube.units,
+        attributes=cube.attributes,
+        cell_methods=target.cell_methods,
+        dim_coords_and_dims=[
+            (coord, target.coord_dims(coord)) for coord in target.dim_coords
+        ],
+        aux_coords_and_dims=[
+            (coord, target.coord_dims(coord)) for coord in target.aux_coords
+        ],
+        aux_factories=target.aux_factories,
+        cell_measures_and_dims=[
+            (cell_measure, target.cell_measure_dims(cell_measure))
+            for cell_measure in target.cell_measures()
+        ],
+        ancillary_variables_and_dims=[
+            (ancil_var, target.ancillary_variable_dims(ancil_var))
+            for ancil_var in target.ancillary_variables()
+        ],
+    )
+
+    return broadcast_cube
