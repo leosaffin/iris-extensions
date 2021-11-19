@@ -179,6 +179,10 @@ available = {
         'function': variable.density,
         'required': ['air_pressure', 'air_temperature']},
 
+    'cloud_top_height': {
+        'function': variable.cloud_top_height,
+        'required': ['total_cloud_content', 'altitude']},
+
     'derived_pv': {
         'function': variable.potential_vorticity,
         'required': ['x_wind', 'y_wind', 'upward_air_velocity',
@@ -245,6 +249,11 @@ available = {
     'mass_thickness': {
         'function': _multiply,
         'required': ['thickness', 'air_density']},
+
+    'total_cloud_content': {
+        'function': _summation,
+        'required': ['mass_fraction_of_cloud_liquid_water_in_air',
+                     'mass_fraction_of_cloud_ice_in_air']},
 
     'total_column_water': {
         'function': variable.column_integral,

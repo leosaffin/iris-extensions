@@ -5,7 +5,7 @@ set of prognostic fields.
 import numpy as np
 import iris.cube
 import iris.analysis
-from iris.analysis import maths, cartography
+from iris.analysis import maths, cartography, MAX
 
 from irise import calculus, constants, grid, interpolate
 from irise.fortran import variable as fvariable
@@ -179,7 +179,12 @@ def height(cube):
     Returns:
         iris.cube.Cube:
     """
-    return grid.make_cube(cube, 'altitude')
+    z = grid.make_cube(cube, 'altitude')
+
+    if z.shape != cube.shape:
+        z = grid.broadcast_to_cube(z, cube)
+
+    return z
 
 
 def surface_height(cube):
@@ -225,6 +230,17 @@ def geopotential_height(P, levels):
     geopotential.rename('Geopotential_height')
 
     return geopotential
+
+
+def cloud_top_height(cloud, altitude):
+    # Mask the altitude so we only see where there is cloud
+    z_masked = altitude.copy(data=np.ma.masked_where(cloud.data <= 0, altitude.data))
+
+    # Find the highest point in each column
+    z_coord = z_masked.coord(axis="z", dim_coords=True)
+    z_cld_top = z_masked.collapsed([z_coord], MAX)
+
+    return z_cld_top
 
 
 def coriolis_parameter(cube):
