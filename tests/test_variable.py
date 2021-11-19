@@ -32,6 +32,8 @@ def test_scalars(function, inputs, result):
 # height
 # surface_height
 # geopotential_height
+# cloud_top_height
+# cloud_thickness
 # coriolis_parameter
 # potential_vorticity
 # isentropic_circulation

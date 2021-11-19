@@ -233,6 +233,17 @@ def geopotential_height(P, levels):
 
 
 def cloud_top_height(cloud, altitude):
+    """The altitude of the highest gridbox containing cloud in each column
+
+    Args:
+        cloud (iris.cube.Cube): Cloud amount
+
+        altitude (iris.cube.Cube):
+
+    Returns:
+        iris.cube.Cube: cloud top height
+
+    """
     # Mask the altitude so we only see where there is cloud
     z_masked = altitude.copy(data=np.ma.masked_where(cloud.data <= 0, altitude.data))
 
@@ -241,6 +252,31 @@ def cloud_top_height(cloud, altitude):
     z_cld_top = z_masked.collapsed([z_coord], MAX)
 
     return z_cld_top
+
+
+def cloud_thickness(cloud, dz):
+    """Total thickness of cloud in the grid column
+
+    Sum of gridbox depths for each gridbox in the column containing cloud
+
+    Args:
+        cloud (iris.cube.Cube): Cloud amount
+
+        dz (iris.cube.Cube): Gridbox vertical thickness
+
+    Returns:
+        iris.cube.Cube: Total cloud thickness
+
+    """
+    cloud.data = (cloud.data > 0).astype(int) * dz.data
+
+    cloud_depth = cloud.collapsed(
+        [cloud.coord(axis="z", dim_coords=True)], iris.analysis.SUM
+    )
+
+    cloud_depth.units = dz.units
+
+    return cloud_depth
 
 
 def coriolis_parameter(cube):

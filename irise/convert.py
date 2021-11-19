@@ -179,6 +179,10 @@ available = {
         'function': variable.density,
         'required': ['air_pressure', 'air_temperature']},
 
+    'cloud_thickness': {
+        'function': variable.cloud_thickness,
+        'required': ['total_cloud_content', 'thickness']},
+
     'cloud_top_height': {
         'function': variable.cloud_top_height,
         'required': ['total_cloud_content', 'altitude']},
