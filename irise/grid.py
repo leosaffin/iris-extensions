@@ -102,7 +102,7 @@ def volume(cube, z_name="altitude"):
         iris.cube.Cube: A cube copied from the original with the volume
         information
     """
-    vol = area(cube) * thickness(cube, z_name=z_name)
+    vol = area(cube) * thickness(cube, z_name=z_name).data
 
     # Convert the output to a cube
     output = cube.copy(data=vol)
