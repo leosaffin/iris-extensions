@@ -100,98 +100,33 @@ stash_map = {
         dict(name="cloud_theta", units="K"),
     STASH(model=1, section=0, item=611):
         dict(name="pc2_checks_theta", units="K"),
-
     # Moisture tracers
-    STASH(model=1, section=0, item=635):
+    STASH(model=1, section=0, item=701):
         dict(name="advection_only_q", units="1"),
-    STASH(model=1, section=0, item=636):
-        dict(name="advection_only_qcl", units="1"),
-    STASH(model=1, section=0, item=637):
-        dict(name="advection_only_qcf", units="1"),
-    STASH(model=1, section=0, item=638):
+    STASH(model=1, section=0, item=702):
         dict(name="short_wave_radiation_q", units="1"),
-    STASH(model=1, section=0, item=639):
-        dict(name="short_wave_radiation_qcl", units="1"),
-    STASH(model=1, section=0, item=640):
+    STASH(model=1, section=0, item=703):
         dict(name="long_wave_radiation_q", units="1"),
-    STASH(model=1, section=0, item=641):
-        dict(name="long_wave_radiation_qcl", units="1"),
-    STASH(model=1, section=0, item=642):
+    STASH(model=1, section=0, item=704):
         dict(name="microphysics_q", units="1"),
-    STASH(model=1, section=0, item=643):
-        dict(name="microphysics_qcl", units="1"),
-    STASH(model=1, section=0, item=644):
-        dict(name="microphysics_qcf", units="1"),
-    STASH(model=1, section=0, item=645):
-        dict(name="pc2_checks_q", units="1"),
-    STASH(model=1, section=0, item=646):
-        dict(name="pc2_checks_qcl", units="1"),
-    STASH(model=1, section=0, item=647):
-        dict(name="pc2_checks_qcf", units="1"),
-    STASH(model=1, section=0, item=648):
+    STASH(model=1, section=0, item=705):
         dict(name="convection_q", units="1"),
-    STASH(model=1, section=0, item=649):
-        dict(name="convection_qcl", units="1"),
-    STASH(model=1, section=0, item=650):
-        dict(name="convection_qcf", units="1"),
-    STASH(model=1, section=0, item=651):
+    STASH(model=1, section=0, item=706):
         dict(name="boundary_layer_q", units="1"),
-    STASH(model=1, section=0, item=652):
-        dict(name="boundary_layer_qcl", units="1"),
-    STASH(model=1, section=0, item=653):
-        dict(name="boundary_layer_qcf", units="1"),
-    STASH(model=1, section=0, item=654):
+    STASH(model=1, section=0, item=707):
+        dict(name="microphysics_cloud_q", units="1"),
+    STASH(model=1, section=0, item=708):
+        dict(name="PC2_checks_q", units="1"),
+    STASH(model=1, section=0, item=709):
+        dict(name="boundary_layer_cloud_q", units="1"),
+    STASH(model=1, section=0, item=710):
         dict(name="cloud_q", units="1"),
-    STASH(model=1, section=0, item=655):
-        dict(name="cloud_qcl", units="1"),
-    STASH(model=1, section=0, item=656):
-        dict(name="cloud_qcf", units="1"),
-    STASH(model=1, section=0, item=657):
-        dict(name="pc2_erosion_q", units="1"),
-    STASH(model=1, section=0, item=658):
-        dict(name="pc2_erosion_qcl", units="1"),
-    STASH(model=1, section=0, item=659):
-        dict(name="slow_physics_q", units="1"),
-    STASH(model=1, section=0, item=660):
-        dict(name="slow_physics_qcl", units="1"),
-    STASH(model=1, section=0, item=661):
-        dict(name="slow_physics_qcf", units="1"),
-    STASH(model=1, section=0, item=662):
-        dict(name="advection_correction_q", units="1"),
-    STASH(model=1, section=0, item=663):
-        dict(name="advection_correction_qcl", units="1"),
-    STASH(model=1, section=0, item=664):
-        dict(name="advection_correction_qcf", units="1"),
-    STASH(model=1, section=0, item=665):
-        dict(name="solver_q", units="1"),
-    STASH(model=1, section=0, item=666):
-        dict(name="solver_qcl", units="1"),
-    STASH(model=1, section=0, item=667):
-        dict(name="solver_qcf", units="1"),
-    STASH(model=1, section=0, item=668):
+    STASH(model=1, section=0, item=711):
         dict(name="methane_oxidation_q", units="1"),
-    STASH(model=1, section=0, item=669):
-        dict(name="microphysics_settling_q", units="1"),
-    STASH(model=1, section=0, item=670):
-        dict(name="microphysics_fixes_q", units="1"),
-    STASH(model=1, section=0, item=671):
-        dict(name="microphysics_nucleation_q", units="1"),
-    STASH(model=1, section=0, item=672):
-        dict(name="microphysics_deposition_q", units="1"),
-    STASH(model=1, section=0, item=673):
-        dict(name="microphysics_evaporation_q", units="1"),
-    STASH(model=1, section=0, item=674):
-        dict(name="microphysics_melting_q", units="1"),
-    STASH(model=1, section=0, item=675):
-        dict(name="boundary_layer_entrainment_q", units="1"),
-    STASH(model=1, section=0, item=676):
-        dict(name="boundary_layer_surface_fluxes_q", units="1"),
-    STASH(model=1, section=0, item=677):
-        dict(name="boundary_layer_other_q", units="1"),
-    STASH(model=1, section=0, item=678):
-        dict(name="fast_physics_q", units="1"),
-    STASH(model=1, section=0, item=679):
-        dict(name="theta_perturbations_q", units="1"),
-    STASH(model=1, section=0, item=680):
+    STASH(model=1, section=0, item=712):
         dict(name="leonard_terms_q", units="1"),
+    STASH(model=1, section=0, item=713):
+        dict(name="perturbations_q", units="1"),
+    STASH(model=1, section=0, item=714):
+        dict(name="rain_evaporation_q", units="1"),
 }
