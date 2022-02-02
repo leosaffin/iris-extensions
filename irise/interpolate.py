@@ -138,17 +138,23 @@ def to_level(cube, order=0, **kwargs):
     coord_in = cube.coord(coord_name)
     coord_out = kwargs[coord_name]
 
-    # Broadcast array to cube shape
+    # Broadcast coordinate arrays to 3d
+    # Input array should match cube shape
+    coord_in_points = iris.util.broadcast_to_shape(coord_in.points, cube.shape, coord_in.cube_dims(cube))
+
+    # Output coordinate should be 3d with nz specified by the input
     dims = np.ndim(coord_out)
     if dims == 1:
         ny, nx = cube.shape[1:]
         coord_out_3d = coord_out * np.ones([nx, ny, len(coord_out)])
         coord_out_3d = coord_out_3d.transpose()
+    elif dims == 2:
+        coord_out_3d = np.expand_dims(coord_out, axis=0)
     elif dims == 3:
         coord_out_3d = coord_out
 
     else:
-        raise Exception('Coordinate must be 3d or a list of levels')
+        raise Exception('Coordinate must be 2d surface(s) or a list of levels')
 
     # Select the interpolation flag based on the coordinate
     if 'pressure' in coord_name:
@@ -160,7 +166,7 @@ def to_level(cube, order=0, **kwargs):
 
     # Interpolate data
     newdata, mask = finterpolate.to_level(
-        cube.data, coord_in.points, coord_out_3d, interp_flag, order)
+        cube.data, coord_in_points, coord_out_3d, interp_flag, order)
     newdata = np.ma.masked_where(mask, newdata)
 
     # Create a new cube with the new number of vertical levels
@@ -170,15 +176,21 @@ def to_level(cube, order=0, **kwargs):
         dim_coords_and_dims=[(cube.coord(axis='y', dim_coords=True), 1),
                              (cube.coord(axis='x', dim_coords=True), 2)])
 
+    if dims == 2:
+        newcube = iris.util.squeeze(newcube)
+
     # Add the new co-ordinate to the output cube
     newcoord = iris.coords.AuxCoord(
         coord_out, long_name=coord_name, units=coord_in.units)
     newcube.add_aux_coord(newcoord, range(newcoord.ndim))
 
     # Promote single dimensional coordinates to dimensional coordinates
-    try:
+    if dims == 1:
         iris.util.promote_aux_coord_to_dim_coord(newcube, coord_name)
-    except ValueError:
+
+    # If the input was a stack of 2d surfaces then add a dummy vertical coordinate
+    # If there is only a single 2d surface then a dummy coordinate is not needed
+    elif dims == 3:
         dummy_coord = iris.coords.DimCoord(range(len(coord_out)),
                                long_name='level_number')
         newcube.add_dim_coord(dummy_coord, 0)
