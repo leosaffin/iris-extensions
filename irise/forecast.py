@@ -191,7 +191,9 @@ class _CubeLoader(object):
         self._make_space(time)
 
         # Load data from files with that lead time
-        cubes = irise.load(self.files[time])
+        cubes = irise.load(
+            self.files[time], iris.Constraint(time=lambda cell: cell.point == time)
+        )
 
         # Add the data to the loaded files
         self._loaded[time] = cubes
