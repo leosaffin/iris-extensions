@@ -210,6 +210,10 @@ available = {
         'function': _nothing,
         'required': ['derived_pv']},
 
+    'lower_tropospheric_stability':{
+        'function': variable.lower_tropospheric_stability,
+        'required': ['air_potential_temperature', 'air_pressure']},
+
     'mass': {
         'function': _multiply,
         'required': ['air_density', 'volume']},

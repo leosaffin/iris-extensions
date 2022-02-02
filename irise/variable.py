@@ -605,6 +605,30 @@ def isentropic_density(p, theta):
     return sigma
 
 
+def lower_tropospheric_stability(theta, P):
+    r"""Calculate lower tropospheric stability
+
+    Defined as
+    :math:`LTS = \theta_{700hPa} - \theta_{1000hPa}`
+
+    Args:
+        theta (iris.cube.Cube):
+        P (iris.cube.Cube):
+
+    Returns:
+
+    """
+    theta_on_p = theta.copy()
+    theta_on_p = grid.add_cube_as_coord(theta_on_p, P)
+    theta_on_p.coord(P.name()).convert_units("hPa")
+
+    theta_on_p = interpolate.to_level(theta, **{P.name(): [700, 1000]})
+
+    LTS = theta_on_p[0] - theta_on_p[1]
+
+    return LTS
+
+
 def vorticity(u, v, w):
     r"""Calculate vorticity at theta-points
 
