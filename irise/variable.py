@@ -7,7 +7,8 @@ import iris.cube
 import iris.analysis
 from iris.analysis import maths, cartography, MAX
 
-from irise import calculus, constants, grid, interpolate
+from irise import calculus, grid, interpolate
+from irise.constants import Cp_d, Rd, Rv, P0, omega, g, Re, Lv, Mw, Md
 from irise.fortran import variable as fvariable
 
 
@@ -22,7 +23,7 @@ def pressure(Pi):
     Returns:
         Air Pressure (Same type as input)
     """
-    return Pi ** (constants.Cp_d / constants.Rd).data * constants.P0
+    return Pi ** (Cp_d / Rd).data * P0
 
 
 def exner(P):
@@ -36,7 +37,7 @@ def exner(P):
     Returns:
         Exner Pressure (Same type as input)
     """
-    return (P / constants.P0) ** (constants.Rd / constants.Cp_d).data
+    return (P / P0) ** (Rd / Cp_d).data
 
 
 def density(P, T):
@@ -52,7 +53,7 @@ def density(P, T):
     Returns:
         Air Density (Same type as inputs)
     """
-    return P / (T * constants.Rd)
+    return P / (T * Rd)
 
 
 def wind_speed(u, v, w):
@@ -80,7 +81,7 @@ def theta_e(theta, rvs, T):
     Returns:
         theta_e (iris.cube.Cube)
     """
-    return theta * maths.exp((rvs * constants.Lv) / (T * constants.Cp_d))
+    return theta * maths.exp((rvs * Lv) / (T * Cp_d))
 
 
 def r_vs(P, e_s):
@@ -94,7 +95,7 @@ def r_vs(P, e_s):
     Returns:
         r_vs (Same type as inputs)
     """
-    return (e_s / (P - e_s)) * (constants.water_molecular_weight / constants.dry_air_molecular_weight).data
+    return (e_s / (P - e_s)) * (Mw / Md).data
 
 
 def vapour_pressure(P, q):
@@ -108,7 +109,7 @@ def vapour_pressure(P, q):
     Returns:
         Vapour Pressure (Same type as inputs)
     """
-    return P * q * (constants.Rv / constants.Rd)
+    return P * q * (Rv / Rd)
 
 
 def tetens(T):
@@ -296,7 +297,7 @@ def coriolis_parameter(cube):
     """
     # Calculate the Coriolis parameter
     lat = grid.true_coords(cube)[1]
-    f = 2 * constants.omega.data * np.sin(np.deg2rad(lat))
+    f = 2 * omega.data * np.sin(np.deg2rad(lat))
 
     # Put the output into a cube
     f = iris.cube.Cube(
@@ -336,7 +337,7 @@ def potential_vorticity(u, v, w, theta, rho):
 
     # Absolute vorticity
     lat = grid.true_coords(theta)[1]
-    f = 2 * constants.omega.data * np.sin(lat * np.pi / 180)
+    f = 2 * omega.data * np.sin(lat * np.pi / 180)
     zterm.data = zterm.data + f
 
     # Grad(theta)
@@ -397,7 +398,7 @@ def isentropic_circulation(pv, pressure, mask=None):
     dp_dtheta = calculus.differentiate(p_theta, 'air_potential_temperature')
 
     # Calculate isentropic density
-    sigma = -1 * dp_dtheta / constants.g
+    sigma = -1 * dp_dtheta / g
 
     # Apply the mask to sigma as it is used in each calculation
     if mask is not None:
@@ -443,8 +444,8 @@ def mslp(theta, Pi, w, lapse_rate=0.0065, npmsl_height=500.0):
         iris.cube.Cube:
     """
     # Extract height coordinate of each grid position
-    z_theta = constants.earth_avg_radius.data + w.coord('altitude').points
-    z_rho = constants.earth_avg_radius.data + Pi.coord('altitude').points[:-1]
+    z_theta = Re.data + w.coord('altitude').points
+    z_rho = Re.data + Pi.coord('altitude').points[:-1]
     level_height = theta.coord('level_height').points
 
     # Calculate grid variables
@@ -466,8 +467,8 @@ def mslp(theta, Pi, w, lapse_rate=0.0065, npmsl_height=500.0):
     # Calculate mean sea-level pressure using hacked MetUM routine
     P_msl = fvariable.calc_pmsl(
         theta.data, Pi.data, P.data, P_star.data, z_theta, z_rho, cos_theta_lat,
-        level_height, constants.Cp_d.data, constants.g.data, constants.Rd.data,
-        lapse_rate, constants.earth_avg_radius.data, delta_lambda, delta_phi,
+        level_height, Cp_d.data, g.data, Rd.data,
+        lapse_rate, Re.data, delta_lambda, delta_phi,
         npmsl_height)
 
     # Copy data into a new cube
@@ -522,7 +523,7 @@ def brunt_vaisala_squared(theta, zcoord='altitude'):
     dtheta_dz = interpolate.interpolate(dtheta_dz, **{zdim.name(): zdim.points})
 
     # Calculate Brunt-Vaisala frequency squared
-    N_sq = (dtheta_dz / theta) * constants.g
+    N_sq = (dtheta_dz / theta) * g
 
     # Correct units because iris is shit sometimes
     N_sq.units = 's-2'
@@ -572,7 +573,7 @@ def Eady(theta, u, P, pressure_levels=(85000, 40000),
 
     # Calculate the Brunt-Vaisala frequency
     dtheta_dz = calculus.multidim(theta, z, 'z')
-    N_sq = dtheta_dz * (constants.g / theta_0)
+    N_sq = dtheta_dz * (g / theta_0)
     N_sq.units = 's-2'
     N = N_sq ** 0.5
 
@@ -604,7 +605,7 @@ def isentropic_density(p, theta):
     dp_dtheta = interpolate.interpolate(dp_dtheta,  **{z.name(): z.points})
 
     # Calculate isentropic density
-    sigma = -1 * dp_dtheta / constants.g
+    sigma = -1 * dp_dtheta / g
 
     return sigma
 
