@@ -187,6 +187,10 @@ available = {
         'function': variable.cloud_top_height,
         'required': ['total_cloud_content', 'altitude']},
 
+    'cloud_top_temperature': {
+        'function': variable.cloud_top_temperature,
+        'required': ['temperature', 'cloud_top_height']},
+
     'derived_pv': {
         'function': variable.potential_vorticity,
         'required': ['x_wind', 'y_wind', 'upward_air_velocity',

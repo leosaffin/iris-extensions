@@ -254,6 +254,10 @@ def cloud_top_height(cloud, altitude):
     return z_cld_top
 
 
+def cloud_top_temperature(T, z_cld_top):
+    return interpolate.to_level(T, **{'altitude': z_cld_top.data})
+
+
 def cloud_thickness(cloud, dz):
     """Total thickness of cloud in the grid column
 
