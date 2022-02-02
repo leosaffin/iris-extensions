@@ -175,11 +175,9 @@ def add_cube_as_coord(cube, coord_cube):
     """
     coord = make_coord(coord_cube)
 
-    common_dimensions = None
+    common_dimensions = [cube.dim_coords.index(coord) for coord in coord_cube.dim_coords]
 
     cube.add_aux_coord(coord, common_dimensions)
-
-    return
 
 
 def add_hybrid_height(cube):
