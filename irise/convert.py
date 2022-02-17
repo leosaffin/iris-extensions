@@ -95,7 +95,9 @@ def calculate(name, cubelist, requested=[]):
     if name in requested:
         raise ValueError('Can not get ' + name + ' from cubelist.')
     else:
-        requested.append(name)
+        # Make a copy to avoid permanently changing the default argument
+        requested_names = requested.copy()
+        requested_names.append(name)
 
     # If the cube is in the cubelist simply extract and return it
     newcubelist = cubelist.extract(name)
@@ -110,7 +112,10 @@ def calculate(name, cubelist, requested=[]):
     # variable from existing cube in the input cubelist
     elif name in available:
         # Calculate all required variables
-        args = [calculate(var, cubelist, requested.copy()) for var in available[name]['required']]
+        args = [
+            calculate(var, cubelist, requested_names)
+            for var in available[name]['required']
+        ]
         # Call the function to calculate the requested variable
         cube = available[name]['function'](*args)
         cube.rename(name)
