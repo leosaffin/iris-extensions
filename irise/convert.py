@@ -69,7 +69,7 @@ def calc(names, cubelist, levels=None):
             return output
 
 
-def calculate(name, cubelist):
+def calculate(name, cubelist, requested=[]):
     """Calculates any variable available from the cubelist
 
     Args:
@@ -79,6 +79,11 @@ def calculate(name, cubelist):
             requested variable or the variables required to calculate the
             requested variable
 
+        requested (list): A list of variables already requested while calling
+            calculate. This should be left blank as it is only used to prevent
+            an infinite recursion when a variable can't be calculated. i.e by
+            alternately requesting air_pressure/exner_pressure when neither are
+            in the cubelist
     Returns:
         iris.cube.Cube: The variable requested
 
@@ -86,6 +91,12 @@ def calculate(name, cubelist):
         ValueError: If the requested variable is not available or there are
             multiple matching cubes in the input `cubelist`.
     """
+    # If we have already tried to calculate the requested cube in this loop
+    if name in requested:
+        raise ValueError('Can not get ' + name + ' from cubelist.')
+    else:
+        requested.append(name)
+
     # If the cube is in the cubelist simply extract and return it
     newcubelist = cubelist.extract(name)
     if len(newcubelist) == 1:
@@ -99,7 +110,7 @@ def calculate(name, cubelist):
     # variable from existing cube in the input cubelist
     elif name in available:
         # Calculate all required variables
-        args = [calc(var, cubelist) for var in available[name]['required']]
+        args = [calculate(var, cubelist, requested.copy()) for var in available[name]['required']]
         # Call the function to calculate the requested variable
         cube = available[name]['function'](*args)
         cube.rename(name)
