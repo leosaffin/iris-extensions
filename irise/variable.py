@@ -3,6 +3,8 @@ set of prognostic fields.
 """
 
 import numpy as np
+import metpy.calc
+from metpy.units import units
 import iris.cube
 import iris.analysis
 from iris.analysis import maths, cartography, MAX
@@ -10,6 +12,15 @@ from iris.analysis import maths, cartography, MAX
 from irise import calculus, grid, interpolate
 from irise.constants import Cp_d, Rd, Rv, P0, omega, g, Re, Lv, Mw, Md
 from irise.fortran import variable as fvariable
+
+
+def _as_quantity(cube):
+    # When using MetPy functions the cube needs to be converted to a Pint.Quantity with
+    # units
+    if isinstance(cube.data, np.ma.MaskedArray):
+        return units.Quantity(cube.data.data, units=str(cube.units))
+    else:
+        return units.Quantity(cube.data, units=str(cube.units))
 
 
 def pressure(Pi):
@@ -123,6 +134,13 @@ def tetens(T):
     """
     x = iris.cube.Cube(610.94, units='Pa')
     return maths.exp(17.625 * (T - 273) / (T - 30)) * x
+
+
+def moist_adiabatic_lapse_rate(T, rvs):
+    return (g / Cp_d) * (
+            (1 + (Lv * rvs) / (Rd * T)) /
+            (1 + (Lv ** 2 * rvs) / (Cp_d * Rv * T ** 2))
+    )
 
 
 def category_map(*args):
@@ -587,6 +605,45 @@ def Eady(theta, u, P, pressure_levels=(85000, 40000),
     return sigma
 
 
+def estimated_inversion_strength(theta, T, MALR, P):
+    """Calculate estimated inversion strength
+
+    Args:
+        theta (iris.cube.Cube): Potential temperature
+        T (iris.cube.Cube): Temperature
+        MALR (iris.cube.Cube): Moist adiabatic lapse rate
+        P (iris.cube.Cube): Pressure
+
+    Returns:
+        iris.cube.Cube
+    """
+    LTS = lower_tropospheric_stability(theta, P)
+
+    Pcoord = P.copy()
+    Pcoord.convert_units("hPa")
+    MALR = MALR.copy()
+    grid.add_cube_as_coord(MALR, Pcoord)
+    MALR_850 = interpolate.to_level(MALR, air_pressure=[850])
+
+    # Calculate LCL from lowest vertical level
+    zcoord = P.coord(axis="z", dim_coords=True)
+    cs_surf = iris.Constraint(**{zcoord.name(): zcoord.points[0]})
+    P_surf = _as_quantity(P.extract(cs_surf))
+    T_surf = _as_quantity(T.extract(cs_surf))
+
+    Td = metpy.calc.dewpoint_from_relative_humidity(T_surf, 0.8)
+    LCL = metpy.calc.lcl(pressure=P_surf, temperature=T_surf, dewpoint=Td)[0]
+    LCL = iris.cube.Cube(LCL.magnitude, units=LCL.units)
+    LCL.convert_units("hPa")
+
+    z = height(P)
+    grid.add_cube_as_coord(z, Pcoord)
+    z700 = interpolate.to_level(z, air_pressure=[700])[0]
+    zLCL = interpolate.to_level(z, air_pressure=[LCL.data])[0]
+
+    return LTS - MALR_850 * (z700 - zLCL)
+
+
 def isentropic_density(p, theta):
     r"""Calculate isentropic density at rho-points
 
@@ -624,10 +681,10 @@ def lower_tropospheric_stability(theta, P):
 
     """
     theta_on_p = theta.copy()
-    theta_on_p = grid.add_cube_as_coord(theta_on_p, P)
+    grid.add_cube_as_coord(theta_on_p, P)
     theta_on_p.coord(P.name()).convert_units("hPa")
 
-    theta_on_p = interpolate.to_level(theta, **{P.name(): [700, 1000]})
+    theta_on_p = interpolate.to_level(theta_on_p, **{P.name(): [700, 1000]})
 
     LTS = theta_on_p[0] - theta_on_p[1]
 

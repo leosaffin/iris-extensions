@@ -230,6 +230,14 @@ available = {
         'function': _nothing,
         'required': ['derived_pv']},
 
+    'estimated_inversion_strength': {
+        'function': variable.estimated_inversion_strength,
+        'required': ["air_potential_temperature",
+                     "air_temperature",
+                     'moist_adiabatic_lapse_rate',
+                     "air_pressure"]
+    },
+
     'lower_tropospheric_stability':{
         'function': variable.lower_tropospheric_stability,
         'required': ['air_potential_temperature', 'air_pressure']},
@@ -247,6 +255,11 @@ available = {
         'function': _summation,
         'required': ['mass_fraction_of_cloud',
                      'specific_humidity']},
+
+    'moist_adiabatic_lapse_rate': {
+        'function': variable.moist_adiabatic_lapse_rate,
+        'required': ['air_temperature', 'saturated_humidity_mixing_ratio']
+    },
 
     'relative_humidity': {
         'function': _divide,
