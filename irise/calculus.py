@@ -80,9 +80,9 @@ def polar_horizontal(cube, axis):
     r"""Differentiate a cube with respect to lon/lat and convert to x/y
 
 
-    :math:`dx = r cos(\phi) d\lambda`
+    :math:`\frac{da}{dx} = \frac{1}{r cos(\phi)} \frac{da}{d\lambda}`
 
-    :math:`dy = r d\phi`
+    :math:`\frac{da}{dy} = \frac{1}{r cos(\phi)} \frac{da cos(\phi)}{d\phi}`
 
     args:
         cube (iris.cube.Cube):
@@ -94,33 +94,30 @@ def polar_horizontal(cube, axis):
         iris.cube.Cube: The derivative of the cube along the chosen polar axis
     """
     # Calculate derivative with respect to polar axis in radians
-    diff = diff_by_axis(cube, axis) / constants.radians_per_degree
+    if axis.lower() == 'x':
+        diff = diff_by_axis(cube, axis) / constants.radians_per_degree
+
+    elif axis.lower() == 'y':
+        lat = cube.coord(axis='y').points * constants.radians_per_degree.data
+        lat = np.outer(lat, np.ones(cube.shape[-1]))
+        diff = diff_by_axis(cube * np.cos(lat), axis) / constants.radians_per_degree
+    else:
+        raise ValueError('Can only specify x or y axis')
 
     # Convert the differential to x/y by considering the distance in lon/lat
     # Coordinates
     # Calculate radius relative to Earth centre
-    radius = grid.make_cube(diff, 'altitude')
-    radius.data += constants.earth_avg_radius.data
+    radius = grid.make_cube(diff, 'altitude') + constants.earth_avg_radius
 
     if radius.ndim == 1:
-        radius = iris.util.broadcast_to_shape(radius.data, diff.shape, [0])
-        radius = diff.copy(data=radius)
-        radius.rename("altitude")
-        radius.units = "m"
+        radius = grid.broadcast_to_cube(radius, diff)
 
-    if axis.lower() == 'x':
-        lat = (diff.coord(axis='y').points *
-               constants.radians_per_degree.data)
-        lat = np.outer(lat, np.ones(diff.shape[-1]))
-        metres_per_radian = radius * np.cos(lat)
-
-    elif axis.lower() == 'y':
-        metres_per_radian = radius
-    else:
-        raise ValueError('Can only specify x or y axis')
-
+    lat = diff.coord(axis='y').points * constants.radians_per_degree.data
+    lat = np.outer(lat, np.ones(diff.shape[-1]))
+    metres_per_radian = radius * np.cos(lat)
     metres_per_radian.units = 'm radian-1'
     diff = diff / metres_per_radian
+
     return diff
 
 
@@ -136,13 +133,13 @@ def div(u, v, w):
         iris.cube.Cube: The divergence
     """
     # Calculate individual components
-    du_dx = polar_horizontal(u, 'x')
+    du_dx = polar_horizontal(u, "x")
     du_dx = interpolate.remap_3d(du_dx, w)
 
-    dv_dy = polar_horizontal(v, 'y')
+    dv_dy = polar_horizontal(v, "y")
     dv_dy = interpolate.remap_3d(dv_dy, w)
 
-    dw_dz = multidim(w, 'altitude', 'z')
+    dw_dz = multidim(w, "altitude", "z")
     dw_dz = interpolate.remap_3d(dw_dz, w)
 
     # Sum to divergence
@@ -166,13 +163,13 @@ def grad(cube):
         tuple (iris.cube.Cube, iris.cube.Cube, iris.cube.Cube):
             Three cubes of the different components of the vector gradient
     """
-    d_dx = polar_horizontal(cube, 'x')
+    d_dx = polar_horizontal(cube, "x")
     d_dx = interpolate.remap_3d(d_dx, cube)
 
-    d_dy = polar_horizontal(cube, 'y')
+    d_dy = polar_horizontal(cube, "y")
     d_dy = interpolate.remap_3d(d_dy, cube)
 
-    d_dz = multidim(cube, 'altitude', 'z')
+    d_dz = multidim(cube, "altitude", "z")
     d_dz = interpolate.remap_3d(d_dz, cube)
 
     return d_dx, d_dy, d_dz
@@ -191,22 +188,22 @@ def curl(u, v, w):
             Three cubes of the different components of the vector curl
     """
     # Calculate individual gradients
-    dw_dx = polar_horizontal(w, 'x')
+    dw_dx = polar_horizontal(w, "x")
     dw_dx = interpolate.remap_3d(dw_dx, w)
 
-    dw_dy = polar_horizontal(w, 'y')
+    dw_dy = polar_horizontal(w, "y")
     dw_dy = interpolate.remap_3d(dw_dy, w)
 
-    du_dz = multidim(u, 'altitude', 'z')
+    du_dz = multidim(u, "altitude", "z")
     du_dz = interpolate.remap_3d(du_dz, w)
 
-    dv_dz = multidim(v, 'altitude', 'z')
+    dv_dz = multidim(v, "altitude", "z")
     dv_dz = interpolate.remap_3d(dv_dz, w)
 
-    du_dy = polar_horizontal(u, 'y')
+    du_dy = polar_horizontal(u, "y")
     du_dy = interpolate.remap_3d(du_dy, w)
 
-    dv_dx = polar_horizontal(v, 'x')
+    dv_dx = polar_horizontal(v, "x")
     dv_dx = interpolate.remap_3d(dv_dx, w)
 
     # Calculate the components of vorticity
