@@ -37,10 +37,23 @@ def get_stash(cube):
 
 
 stash_map = {
-    STASH(model=1, section=0, item=389): dict(name="air_density", units="kg m-3"),
-    STASH(model=1, section=0, item=394): dict(name="rain_mixing_ratio", units="kg kg-1"),
-    STASH(model=1, section=3, item=476): dict(name="boundary_layer_type", units=""),
-    STASH(model=1, section=30, item=461): dict(name="total_column_water", units="kg m-2"),
+    STASH(model=1, section=0, item=389):
+        dict(name="air_density", units="kg m-3"),
+    STASH(model=1, section=0, item=394):
+        dict(name="rain_mixing_ratio", units="kg kg-1"),
+    STASH(model=1, section=1, item=202):
+        dict(name="surface_net_downward_shorwave_flux", units="W m-2"),
+    STASH(model=1, section=3, item=253):
+        dict(name="probability_of_visibility_less_than_5km", units=""),
+    STASH(model=1, section=3, item=476):
+        dict(name="boundary_layer_type", units=""),
+    STASH(model=1, section=9, item=202):
+        dict(name="very_low_type_cloud_area_fraction", units=""),
+    STASH(model=1, section=9, item=233):
+        dict(name="ceilometer_cloud_area_fraction_assuming_maximum_random_overlap",
+             units=""),
+    STASH(model=1, section=30, item=461):
+        dict(name="total_column_water", units="kg m-2"),
 
     # PV tracers
     STASH(model=1, section=0, item=593):
