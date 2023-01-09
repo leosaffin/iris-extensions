@@ -54,15 +54,16 @@ module interpolate
 
             !-Local Variables-
             integer :: i, j, k, l
-            real :: z
+            real :: z, zcoord(nz)
 
             !-START-
             ! Loop over zcoord_out points
             do l=1,np
                 do i=1,nx
                     do j=1,ny
-                        z = coord_out(l,j,i)
-                        if (out_of_bounds(z, coord_in(:,j,i), nz)) then
+                        z = coord_out(l, j, i)
+                        zcoord = coord_in(:, j, i)
+                        if (z < minval(zcoord) .or. z > maxval(zcoord)) then
                             ! Set the mask to True if the requested value is not within the bounds of zcoord
                             mask(l, j, i) = .True.
                         else
@@ -72,13 +73,13 @@ module interpolate
 
                             ! Find the index of the first zcoord point that has crossed the output coordinate by
                             ! searching downwards
-                            k = search_downwards(z, coord_in(:,j,i), nz)
+                            k = search_downwards(z, zcoord, nz)
 
                             ! Interpolate to the output point
                             if (type == 0) then
-                                output(l,j,i) = linear(variable(:,j,i), coord_in(:,j,i), z, k, nz)
+                                output(l,j,i) = linear(variable(:,j,i), zcoord, z, k, nz)
                             else if (type == 1) then
-                                output(l,j,i) = log_linear(variable(:,j,i), coord_in(:,j,i), z, k, nz)
+                                output(l,j,i) = log_linear(variable(:,j,i), zcoord, z, k, nz)
                                 !else if (type == 2)
                                 ! output(l,j,i) = lagrange(z, coord(:,j,i), k, nz)
                             end if
@@ -101,40 +102,17 @@ module interpolate
 
             !-Local variables-
             integer :: k
-            integer :: plusminus_at_top
+            integer :: sign_at_top
 
             !-START-
-            plusminus_at_top = plusminus(z - zcoord(nz))
+            sign_at_top = sign(1.0, z - zcoord(nz))
             k = nz - 1
-            do while (plusminus_at_top == plusminus(z-zcoord(k)))
+            do while (sign_at_top == sign(1.0, z-zcoord(k)))
                 k = k-1
             end do
 
             search_downwards = k
         end function search_downwards
-
-        ! Check whether the value z is contained within zcoord
-        pure function out_of_bounds(z, zcoord, nz)
-            logical :: out_of_bounds
-
-            !-Input Variables-
-            real, intent(in) :: z, zcoord(nz)
-            integer, intent(in) :: nz
-
-            !-Local variables-
-            real :: zmax, zmin
-            integer :: k
-
-            !-START-
-            zmax = zcoord(1)
-            zmin = zcoord(1)
-            do k=2, nz
-                zmax = max(zmax, zcoord(k))
-                zmin = min(zmin, zcoord(k))
-            end do
-
-            out_of_bounds = z > zmax.or.z < zmin
-        end function out_of_bounds
 
         ! Calculate the interpolation weight assuming linear variation across two points
         function linear(variable, coord, z, k, nz)
@@ -170,20 +148,5 @@ module interpolate
             alpha = log(z / coord(k)) / log(coord(k+1) / coord(k))
             log_linear = alpha * variable(k+1) + (1 - alpha) * variable(k)
         end function log_linear
-
-        ! Check whether x is positive or negative
-        pure function plusminus(x)
-            integer :: plusminus
-
-            !-Input Variables-
-            real, intent(in) :: x
-
-            !-START-
-            if (x < 0.0) then
-                plusminus = -1
-            else
-                plusminus = 1
-            end if
-        end function plusminus
 
 end module interpolate
