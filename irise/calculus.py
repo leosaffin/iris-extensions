@@ -107,13 +107,16 @@ def polar_horizontal(cube, axis):
     # Convert the differential to x/y by considering the distance in lon/lat
     # Coordinates
     # Calculate radius relative to Earth centre
-    radius = grid.make_cube(diff, 'altitude') + constants.earth_avg_radius
+    if "altitude" in [c.name for c in cube.coords()]:
+        radius = grid.make_cube(diff, 'altitude') + constants.earth_avg_radius
+    else:
+        radius = constants.earth_avg_radius
 
-    if radius.ndim == 1:
+    if radius.ndim <= 1:
         radius = grid.broadcast_to_cube(radius, diff)
 
     lat = diff.coord(axis='y').points * constants.radians_per_degree.data
-    lat = np.outer(lat, np.ones(diff.shape[-1]))
+    lat = np.outer(lat, np.ones(len(diff.coord(axis="x").points)))
     metres_per_radian = radius * np.cos(lat)
     metres_per_radian.units = 'm radian-1'
     diff = diff / metres_per_radian
