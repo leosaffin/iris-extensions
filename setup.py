@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+import glob
+import os
+import shutil
 from setuptools import find_packages
 from numpy.distutils.core import setup, Extension
 
@@ -52,3 +55,9 @@ setup(
     libraries = [('interpolate', dict(sources=['irise/interpolate.f90']))],
     ext_modules = [fortran]
 )
+
+# F2PY setup puts compiled module one folder too high
+for fname in glob.glob("irise/fortran.cpython-*.so"):
+    os.remove(fname)
+for fname in glob.glob("fortran.cpython-*.so"):
+    shutil.move(fname, "irise/")
