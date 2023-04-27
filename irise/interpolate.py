@@ -77,13 +77,14 @@ def cross_section(cube, xs, xf, ys, yf, npoints,
     ypoints = np.linspace(ys, yf, npoints)
 
     # Extract the names of the x and y co-ordinates
-    xcoord = cube.coord(axis='X').name()
-    ycoord = cube.coord(axis='Y').name()
+    xcoord = cube.coord(axis='x', dim_coords=True).name()
+    ycoord = cube.coord(axis='y', dim_coords=True).name()
 
     # Call the cube's built in interpolation method
-    newcube = cube.interpolate([(xcoord, xpoints), (ycoord, ypoints)],
-                               interpolator(
-                               extrapolation_mode=extrapolation_mode))
+    newcube = cube.interpolate(
+        [(xcoord, xpoints), (ycoord, ypoints)],
+        interpolator(extrapolation_mode=extrapolation_mode)
+    )
 
     # The interpolation returns a box with all corresponding xpoints and
     # ypoints (i.e. a 3d cube). We need to extract the diagonal line along this
@@ -92,15 +93,13 @@ def cross_section(cube, xs, xf, ys, yf, npoints,
     # shape
     iris.util.demote_dim_coord_to_aux_coord(newcube, ycoord)
 
-    # Take the diagonal line along the 3d cube. Use the cubelist functionality
-    # to reduce this to a single cube
+    # Take the diagonal line along the cube. Use the cubelist functionalityto reduce
+    # this to a single cube.
+    # TODO change this so we aren't assuming the horizontal coordinates are the last
+    # two dimensions
     newcubelist = iris.cube.CubeList()
     for i in range(npoints):
-        try:
-            newcubelist.append(newcube[:, i, i])
-        except IndexError:
-            # Allow 2d cubes to be interpolated
-            newcubelist.append(newcube[i, i])
+        newcubelist.append(newcube[..., i, i])
 
     # Reduce to a single cube. This currently has the side effect of always
     # making the y coordinate the 1st dimension and the z coordinate the 2nd
