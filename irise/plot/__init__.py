@@ -45,7 +45,7 @@ def colored_line_plot(x, y, color, vmin=None, vmax=None, cmap='gray'):
     segments = np.concatenate([points[:-1], points[1:]], axis=1)
 
     # Collect the line segments
-    lc = LineCollection(segments, linewidth=1, cmap=plt.get_cmap(cmap),
+    lc = LineCollection(segments, cmap=plt.get_cmap(cmap),
                         norm=plt.Normalize(vmin, vmax))
 
     # Set the line color to the specified array
