@@ -11,7 +11,6 @@ from iris.analysis import maths, cartography, MAX
 
 from irise import calculus, grid, interpolate
 from irise.constants import Cp_d, Rd, Rv, P0, omega, g, Re, Lv, Mw, Md
-from irise.fortran import variable as fvariable
 
 
 def _as_quantity(cube):
@@ -355,8 +354,12 @@ def potential_vorticity(u, v, w, theta, rho):
 
     # Absolute vorticity
     lat = grid.true_coords(theta)[1]
-    f = 2 * omega.data * np.sin(lat * np.pi / 180)
-    zterm.data = zterm.data + f
+    sin_lat = theta[0].copy(data=np.sin(np.deg2rad(lat)))
+    sin_lat.units = ""
+    f = 2 * omega * sin_lat
+    f.units = "s-1"
+
+    zterm = zterm + f
 
     # Grad(theta)
     dtheta_dx = calculus.polar_horizontal(theta, 'x')
@@ -441,59 +444,6 @@ def isentropic_circulation(pv, pressure, mask=None):
         circulation.append(c_i)
 
     return circulation
-
-
-def mslp(theta, Pi, w, lapse_rate=0.0065, npmsl_height=500.0):
-    """Calculate mean sea-level pressure
-
-    Args:
-        theta (iris.cube.Cube): Potential temperature at theta-points
-
-        Pi (iris.cube.Cube): Exner pressure at rho-points
-
-        w (iris.cube.Cube): Vertical velocity at theta-points, including
-            surface level
-
-        lapse_rate (float): (default is 0.0065)
-
-        npmsl_height (float): (default is 500.0)
-
-    Returns:
-        iris.cube.Cube:
-    """
-    # Extract height coordinate of each grid position
-    z_theta = Re.data + w.coord('altitude').points
-    z_rho = Re.data + Pi.coord('altitude').points[:-1]
-    level_height = theta.coord('level_height').points
-
-    # Calculate grid variables
-    grid_lons, grid_lats = cartography.get_xy_grids(theta)
-    cos_theta_lat = np.cos(grid_lats)
-    delta_lambda = grid_lons[0, 1] - grid_lons[0, 0]
-    delta_phi = grid_lats[1, 0] - grid_lats[0, 0]
-
-    # Calculate pressure and exner on theta levels
-    Pi = interpolate.interpolate(
-        Pi, level_height=w.coord('level_height').points)
-    P = pressure(Pi)
-
-    # Extract surface pressure and remove from other variables
-    P_star = P[0]
-    Pi = Pi[1:]
-    P = P[1:]
-
-    # Calculate mean sea-level pressure using hacked MetUM routine
-    P_msl = fvariable.calc_pmsl(
-        theta.data, Pi.data, P.data, P_star.data, z_theta, z_rho, cos_theta_lat,
-        level_height, Cp_d.data, g.data, Rd.data,
-        lapse_rate, Re.data, delta_lambda, delta_phi,
-        npmsl_height)
-
-    # Copy data into a new cube
-    P_msl = P[0].copy(data=P_msl)
-    P_msl.rename('air_pressure_at_mean_sea_level')
-
-    return P_msl
 
 
 def brunt_vaisala(theta, zcoord='altitude'):
