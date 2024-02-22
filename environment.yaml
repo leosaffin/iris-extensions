@@ -6,3 +6,4 @@ dependencies:
   - sphinx
   - sphinx_rtd_theme
   - iris
+  - metpy
