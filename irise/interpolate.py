@@ -4,8 +4,8 @@ import iris.analysis
 import iris.cube
 import iris.coords
 import iris.util
-
-from irise.fortran import interpolate as finterpolate
+import numba
+from numba import jit
 
 
 def interpolate(cube, interpolator=iris.analysis.Linear, extrapolation_mode='linear',
@@ -164,8 +164,7 @@ def to_level(cube, order=0, **kwargs):
         interp_flag = 0
 
     # Interpolate data
-    newdata, mask = finterpolate.to_level(
-        cube.data, coord_in_points, coord_out_3d, interp_flag, order)
+    newdata, mask = down_to_level(cube.data, coord_in_points, coord_out_3d, interp_flag)
     newdata = np.ma.masked_where(mask, newdata)
 
     # Create a new cube with the new number of vertical levels
@@ -246,3 +245,73 @@ def remap_3d(cube, target, vert_coord=None):
             newcube.add_aux_coord(coord)
 
     return newcube
+
+
+@jit(nopython=True)
+def down_to_level(variable, coord_in, coord_out, type):
+    # Interpolate to the output point
+    if type == 0:
+        interp_function = linear
+    elif type == 1:
+        interp_function = log_linear
+
+    # Loop over zcoord_out points
+    npr, ny, nx = coord_out.shape
+    output = np.zeros((npr, ny, nx), dtype=float)
+    mask = np.zeros((npr, ny, nx), dtype=numba.boolean)
+    for l in range(npr):
+        for j in range(ny):
+            for i in range(nx):
+                z = coord_out[l, j, i]
+                zcoord = coord_in[:, j, i]
+                if z < zcoord.min() or z > zcoord.max():
+                    # Set the mask to True if the requested value is not within the
+                    # bounds of zcoord
+                    mask[l, j, i] = True
+                else:
+                    # Set the mask to False and do the interpolation if the requested
+                    # value is within the bounds of zcoord
+                    mask[l, j, i] = False
+
+                    # Find the index of the first zcoord point that has crossed the
+                    # output coordinate by searching downwards
+                    k = search_downwards(z, zcoord)
+
+                    # Interpolate to the output point
+                    output[l, j, i] = interp_function(variable[:, j, i], zcoord, z, k)
+
+    return output, mask
+
+@jit(nopython=True)
+def search_downwards(z, zcoord):
+    """
+    Search downwards to find the index where zcoord first crosses the value z.
+    Before using this function it must be checked that z is within the bounds of zcoord
+    """
+    sign_at_top = np.sign(z - zcoord[-1])
+    k = -2
+    while sign_at_top == np.sign(z - zcoord[k]):
+        k -= 1
+
+    return k
+
+
+@jit(nopython=True)
+def linear(variable, coord, z, k):
+    """
+    Calculate the interpolation weight assuming linear variation across two points
+    """
+    alpha = (z - coord[k]) / (coord[k+1] - coord[k])
+
+    return alpha * variable[k+1] + (1 - alpha) * variable[k]
+
+
+@jit(nopython=True)
+def log_linear(variable, coord, z, k):
+    """
+    Calculate the interpolation weight assuming linear logarithmic variation across two
+    points
+    """
+    alpha = np.log(z / coord[k]) / np.log(coord[k+1] / coord[k])
+
+    return alpha * variable[k+1] + (1 - alpha) * variable[k]

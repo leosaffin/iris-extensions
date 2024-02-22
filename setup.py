@@ -1,24 +1,15 @@
 #!/usr/bin/env python
 
-import glob
-import os
-import shutil
-from setuptools import find_packages
-from numpy.distutils.core import setup, Extension
+from setuptools import find_packages, setup
 
 with open('README.rst') as readme_file:
     readme = readme_file.read()
 
-requirements = ['scitools-iris', 'numpy', 'scipy', 'matplotlib', 'shapely', 'metpy']
+requirements = ['scitools-iris', 'numpy', 'scipy', 'matplotlib', 'shapely', 'numba', 'metpy']
 
 setup_requirements = [ ]
 
 test_requirements = [ ]
-
-fortran = Extension('fortran', libraries=['interpolate'],
-                    sources=['irise/diagnostic.f90',
-                             'irise/interpolate.f90',
-                             'irise/variable.f90'])
 
 setup(
     author="Leo Saffin",
@@ -52,12 +43,4 @@ setup(
     url='https://github.com/LSaffin/iris-extensions',
     version='0.2',
 
-    libraries = [('interpolate', dict(sources=['irise/interpolate.f90']))],
-    ext_modules = [fortran]
 )
-
-# F2PY setup puts compiled module one folder too high
-for fname in glob.glob("irise/fortran.cpython-*.so"):
-    os.remove(fname)
-for fname in glob.glob("fortran.cpython-*.so"):
-    shutil.move(fname, "irise/")
