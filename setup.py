@@ -9,7 +9,7 @@ from numpy.distutils.core import setup, Extension
 with open('README.rst') as readme_file:
     readme = readme_file.read()
 
-requirements = ['scitools-iris', 'numpy', 'scipy', 'matplotlib', 'shapely']
+requirements = ['scitools-iris', 'numpy', 'scipy', 'matplotlib', 'shapely', 'metpy']
 
 setup_requirements = [ ]
 
