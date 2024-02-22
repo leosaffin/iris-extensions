@@ -59,5 +59,5 @@ setup(
 # F2PY setup puts compiled module one folder too high
 for fname in glob.glob("irise/fortran.cpython-*.so"):
     os.remove(fname)
-for fname in glob.rglob("fortran.cpython-*.so"):
+for fname in glob.glob("fortran.cpython-*.so"):
     shutil.move(fname, "irise/")
