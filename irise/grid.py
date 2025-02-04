@@ -1,4 +1,5 @@
 import numpy as np
+from haversine import haversine_vector as haversine
 import iris.aux_factory
 import iris.coords
 import iris.util
@@ -263,3 +264,20 @@ def broadcast_to_cube(cube, target):
     )
 
     return broadcast_cube
+
+
+def area_weights_within_distance(cube, xpoint, ypoint, distance):
+    # Multiply by area within the integral radius, zero elsewhere
+    return cartography.area_weights(cube) * _within_distance(cube, xpoint, ypoint, distance)
+
+
+def _within_distance(cube, xpoint, ypoint, distance):
+    # Calculate distance from storm centre to each gridpoint (to integrate over area)
+    lon, lat = cartography.get_xy_grids(cube)
+
+    yx = np.array([lat.flatten(), lon.flatten()]).transpose()
+    distance_array = haversine(yx, [ypoint, xpoint], comb=True, normalize=True)
+    distance_array = distance_array.reshape(lon.shape)
+
+    # Multiply by area within the integral radius, zero elsewhere
+    return (distance_array < distance).astype(int)
